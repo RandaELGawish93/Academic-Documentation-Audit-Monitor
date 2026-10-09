@@ -33,7 +33,7 @@ function openApplication() {
 
   if (!url) {
 
-    SpreadsheetApp.getUi().error(
+    SpreadsheetApp.getUi().alert(
       "Deploy the project as a Web App first."
     );
 
@@ -86,7 +86,7 @@ function validateSettings() {
 
   if(missing.length===0){
 
-    SpreadsheetApp.getUi().success(
+    SpreadsheetApp.getUi().alert(
       "Settings validation successful."
     );
 
@@ -94,7 +94,7 @@ function validateSettings() {
 
   }
 
-  SpreadsheetApp.getUi().error(
+  SpreadsheetApp.getUi().alert(
 
     "Missing Settings:\n\n" +
 
@@ -130,6 +130,6 @@ function systemInformation(){
 
       (settings["Current Week"] || "-");
 
-  SpreadsheetApp.getUi().success(message);
+  SpreadsheetApp.getUi().alert(message);
 
 }

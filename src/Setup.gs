@@ -39,7 +39,7 @@ function setupSystem() {
 
   SpreadsheetApp.flush();
 
-  SpreadsheetApp.getUi().success("ADAM 2.0 setup completed successfully.");
+  SpreadsheetApp.getUi().alert("ADAM 2.0 setup completed successfully.");
 }
 
 /*******************************************************
@@ -334,8 +334,8 @@ function formatObservationActionCenter(){
   sh.getRange(1,1,1,headers.length).setValues([headers]);
 
   sh.setFrozenRows(1);
-  sheet.autoResizeColumns(1, sheet.getLastColumn());
-  sheet.getRange(2, 7, sheet.getMaxRows(), 1)
+  sh.autoResizeColumns(1, sh.getLastColumn());
+  sh.getRange(2, 7, sh.getMaxRows() - 1, 1)
      .setWrap(true);
 }
 
