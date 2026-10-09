@@ -10,6 +10,18 @@ It replaces a manual routine of opening dozens of folders every week, checking f
 
 ---
 
+## Screenshots
+
+> Screens below show the real interface populated with **fictional sample data** for illustration. No real school, staff or student data is included.
+
+**Dashboard: compliance KPIs and department ranking per module**
+
+![Dashboard: compliance KPIs and department ranking per module](docs/screenshots/adam-dashboard.png)
+
+**Minutes of Meetings Action Center: review findings, categorize, preview the email**
+
+![Minutes of Meetings Action Center: review findings, categorize, preview the email](docs/screenshots/adam-mom-action-center.png)
+
 ## Features
 
 - **Three audit modules in one app**
