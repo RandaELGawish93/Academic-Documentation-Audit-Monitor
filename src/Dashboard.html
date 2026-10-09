@@ -1,0 +1,247 @@
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+
+        <div class="dashboard-title">
+            Dashboard
+        </div>
+
+    </div>
+
+    <div class="dashboard-filters">
+
+        <div class="form-group">
+
+            <label>Academic Year</label>
+
+            <input
+                type="text"
+                id="academicYear"
+                readonly>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Current Trimester</label>
+
+            <input
+                type="text"
+                id="trimester"
+                readonly>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Module</label>
+
+            <select
+                id="module"
+                onchange="refreshDashboard()">
+
+                <option>Minutes of Meetings</option>
+                <option>Subject Screening</option>
+                <option>Teacher Observation</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-title">
+            Recipient Ranking
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Rank</th>
+                    <th>Recipient</th>
+                    <th>Flawless</th>
+                    <th>Amendment</th>
+                    <th>Notice</th>
+                    <th>Missing</th>
+                    <th>Excused</th>
+                    <th>Compliance</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="rankingTable"></tbody>
+
+        </table>
+
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiFlawless">0</div>
+
+            <div class="kpi-label">Flawless</div>
+
+            <div class="kpi-percent" id="kpiFlawlessPercent">0%</div>
+
+        </div>
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiAmendment">0</div>
+
+            <div class="kpi-label">Amendment</div>
+
+            <div class="kpi-percent" id="kpiAmendmentPercent">0%</div>
+
+        </div>
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiNotice">0</div>
+
+            <div class="kpi-label">Notice</div>
+
+            <div class="kpi-percent" id="kpiNoticePercent">0%</div>
+
+        </div>
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiMissing">0</div>
+
+            <div class="kpi-label">Missing</div>
+
+            <div class="kpi-percent" id="kpiMissingPercent">0%</div>
+
+        </div>
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiExcused">0</div>
+
+            <div class="kpi-label">Excused</div>
+
+            <div class="kpi-percent" id="kpiExcusedPercent">0%</div>
+
+        </div>
+
+        <div class="kpi-card">
+
+            <div class="kpi-value" id="kpiCompliance">0%</div>
+
+            <div class="kpi-label">Compliance</div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function refreshDashboard() {
+
+    const module = document.getElementById("module").value;
+
+    showLoading();
+
+    google.script.run
+        .withSuccessHandler(function(data) {
+            renderDashboard(data);
+            hideLoading();
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            console.error(error);
+            alert(error.message);
+        })
+        .getDashboardData(module);
+
+}
+
+function renderDashboard(data) {
+
+    document.getElementById("academicYear").value = data.settings.academicYear;
+    document.getElementById("trimester").value = data.settings.trimester;
+
+    renderRanking(data.ranking);
+    renderSummary(data.summary);
+
+}
+
+function renderRanking(ranking) {
+
+    const tbody = document.getElementById("rankingTable");
+
+    tbody.innerHTML = "";
+
+    if (ranking.length === 0) {
+
+        tbody.innerHTML =
+            "<tr><td colspan='8' style='text-align:center;'>No records found.</td></tr>";
+
+        return;
+
+    }
+
+    ranking.forEach((item, index) => {
+
+        tbody.innerHTML += `
+
+        <tr>
+
+            <td>${index + 1}</td>
+
+            <td>${item.recipient}</td>
+
+            <td>${item.flawless}</td>
+
+            <td>${item.amendment}</td>
+
+            <td>${item.notice}</td>
+
+            <td>${item.missing}</td>
+
+            <td>${item.excused}</td>
+
+            <td>${item.compliance}%</td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+function renderSummary(summary) {
+
+    document.getElementById("kpiFlawless").innerHTML = summary.flawless.count;
+    document.getElementById("kpiFlawlessPercent").innerHTML = summary.flawless.percentage + "%";
+
+    document.getElementById("kpiAmendment").innerHTML = summary.amendment.count;
+    document.getElementById("kpiAmendmentPercent").innerHTML = summary.amendment.percentage + "%";
+
+    document.getElementById("kpiNotice").innerHTML = summary.notice.count;
+    document.getElementById("kpiNoticePercent").innerHTML = summary.notice.percentage + "%";
+
+    document.getElementById("kpiMissing").innerHTML = summary.missing.count;
+    document.getElementById("kpiMissingPercent").innerHTML = summary.missing.percentage + "%";
+
+    document.getElementById("kpiExcused").innerHTML = summary.excused.count;
+    document.getElementById("kpiExcusedPercent").innerHTML = summary.excused.percentage + "%";
+
+    document.getElementById("kpiCompliance").innerHTML = summary.compliance + "%";
+
+}
+
+window.onload = refreshDashboard;
+
+</script>

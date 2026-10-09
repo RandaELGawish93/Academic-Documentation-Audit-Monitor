@@ -1,0 +1,135 @@
+<div>
+
+<p>Dear <b><?= name ?></b>,</p>
+
+<p>
+
+We would like to emphasize that no
+
+<b><?= moduleName ?></b>
+
+submission was found for
+
+<b><?= trimester ?></b>,
+
+<b>Week <?= week ?></b>
+
+in your department's designated submission folder during the latest audit.
+
+</p>
+
+<p>
+
+As a result, the Academic Office was unable to review your department's
+
+<b><?= moduleName ?></b>
+
+submission for this reporting period.
+
+</p>
+
+<div style="margin:25px 0;">
+
+<span class="badge red">
+
+Missing Submission
+
+</span>
+
+</div>
+
+<table>
+
+<? if (subjectName) { ?>
+
+<tr>
+
+    <td width="35%"><b>Subject</b></td>
+
+    <td><?= subjectName ?></td>
+
+</tr>
+
+<tr>
+
+    <td><b>Grade</b></td>
+
+    <td><?= grade ?></td>
+
+</tr>
+
+<? } ?>
+
+<tr>
+
+<td width="35%"><b>Module</b></td>
+
+<td><?= moduleName ?> Audit</td>
+
+</tr>
+
+<tr>
+
+<td><b>Academic Year</b></td>
+
+<td><?= academicYear ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Trimester</b></td>
+
+<td><?= trimester ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Week</b></td>
+
+<td><?= week ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Status</b></td>
+
+<td>Missing Submission</td>
+
+</tr>
+
+<tr>
+
+<td><b>Reason</b></td>
+
+<td>
+
+No <?= moduleName ?> submission was found before the audit deadline.
+
+</td>
+
+</tr>
+
+</table>
+
+<p style="margin-top:30px;">
+
+Kindly upload the required
+
+<b><?= moduleName ?></b>
+
+to the designated Google Drive folder immediately.
+
+If the documents have already been uploaded or you believe this notification has been issued in error, please contact the Academic Office for verification.
+
+</p>
+
+<p>
+
+Failure to submit the required documentation may affect departmental compliance status and may proceed with administative procedures.
+
+</p>
+
+</div>

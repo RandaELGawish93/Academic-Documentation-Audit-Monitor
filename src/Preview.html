@@ -1,0 +1,241 @@
+<div id="previewModal" class="modal hidden">
+<div class="preview-container">
+
+    <div class="preview-header">
+
+        <div>
+
+            <h2>Email Preview</h2>
+
+            <div class="preview-subtitle">
+                Review the email before sending.
+            </div>
+
+        </div>
+
+        <div>
+
+        <div class="preview-actions">
+
+            <button
+                class="secondary-btn"
+                onclick="closePreview()">
+
+                Cancel
+
+            </button>
+
+            <button
+                class="primary-btn"
+                onclick="sendPreviewEmail()">
+
+                Send Email
+
+            </button>
+
+        </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="form-group">
+
+            <label>Subject</label>
+
+            <input
+                id="previewSubject"
+                type="text"
+                readonly>
+
+        </div>
+
+        <br>
+
+        <div class="form-group">
+
+            <label>To</label>
+
+            <input
+                id="previewTo"
+                type="email"
+                readonly>
+
+        </div>
+
+        <br>
+
+        <div class="form-group">
+
+            <label>Additional Recipients</label>
+
+            <div id="previewRecipients">
+
+                Loading...
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <iframe
+            id="previewFrame"
+            style="
+                width:100%;
+                height:650px;
+                border:1px solid #ddd;
+                border-radius:10px;
+                background:white;
+            ">
+        </iframe>
+
+    </div>
+
+</div><!-- preview-container -->
+
+</div><!-- previewModal -->
+
+<script>
+let currentPreviewEmail = null;
+
+function openPreview(emailData){
+    currentPreviewEmail = emailData;
+    document.getElementById("previewTo").value =
+    emailData.email;
+    callServer(
+
+    "receiveEmails",
+
+    [],
+
+    function(users){
+
+        const container =
+            document.getElementById("previewRecipients");
+
+        let html = "";
+
+        users.forEach(function(user){
+
+            html += `
+
+            <label style="display:block;margin-bottom:8px;">
+
+                <input
+                    type="checkbox"
+                    class="previewCC"
+                    value="${user.email}">
+
+                <strong>${user.name}</strong>
+
+                <br>
+
+                <small>${user.role}</small>
+
+            </label>
+
+            `;
+
+        });
+
+        container.innerHTML = html;
+
+    }
+
+);
+    document
+        .getElementById("previewModal")
+        .classList.remove("hidden");
+
+    document.getElementById("previewSubject").value =
+        emailData.subject;
+
+    document.getElementById("previewFrame").srcdoc =
+        emailData.html;
+
+}
+
+function closePreview(){
+
+    document
+        .getElementById("previewModal")
+        .classList.add("hidden");
+
+    document.getElementById("previewSubject").value = "";
+
+    document.getElementById("previewFrame").srcdoc = "";
+
+}
+
+function sendPreviewEmail(){
+
+    if(!currentPreviewEmail){
+
+        error("No email selected.");
+
+        return;
+
+    }
+
+    const cc = [];
+
+    document
+        .querySelectorAll(".previewCC:checked")
+        .forEach(function(item){
+
+            cc.push(item.value);
+
+        });
+
+    currentPreviewEmail.cc = cc.join(",");
+    showConfirm(
+
+        "Send Email",
+
+        "The email will be sent immediately.<br><br>" +
+        "The record will also be removed from the Action Center."
+
+    ).then(function(confirmed){
+        if(!confirmed){
+
+            return;
+
+        }
+
+        callServer(
+
+            "sendEmail",
+
+            [currentPreviewEmail],
+
+            function(){
+
+                callServer(
+
+                    currentPreviewEmail.closeFunction,
+
+                    [currentPreviewEmail.rowNumber],
+
+                    function(){
+
+                        success("Email sent successfully.");
+
+                        closePreview();
+
+                        window[currentPreviewEmail.reloadFunction]();
+
+                    }
+
+                );
+
+            }
+
+        );
+
+    });
+
+}
+</script>

@@ -1,0 +1,338 @@
+<div class="module-container">
+
+    <div class="module-header">
+
+        <div>
+
+            <h2>Minutes of Meetings Audit</h2>
+
+            <div class="module-subtitle">
+                Scan Google Drive folders, review evidence, generate draft emails, and finalize the audit.
+            </div>
+
+        </div>
+
+        <div class="module-actions">
+
+            <button class="primary-btn" onclick="runMoMAudit()">
+                Run Audit
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Action Center -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Action Center
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Division</th>
+                    <th>Department</th>
+                    <th>HoD</th>
+                    <th>Submitted Documents</th>
+                    <th>Findings</th>
+                  <th>Found / Expected</th>
+                    <th>Category</th>
+                    <th>Preview</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="momActionTable">
+
+                <tr>
+
+                    <td colspan="8" style="text-align:center;">
+                        No audit has been run.
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+function runMoMAudit(){
+
+    callServer(
+
+        "runMoMAudit",
+
+        [],
+
+        function(){
+
+            loadMoMActionCenter();
+
+            success("Audit completed successfully.\n\n" +
+              "Please review the Action Center before processing emails.");
+        }
+
+    );
+
+}
+
+
+function loadMoMActionCenter(){
+
+    callServer(
+
+        "getMoMActionCenter",
+
+        [],
+
+        function(rows){
+
+            const tbody = document.getElementById("momActionTable");
+
+            if(rows.length === 0){
+
+                tbody.innerHTML =
+                    "<tr><td colspan='8' style='text-align:center;'>No records.</td></tr>";
+
+                return;
+
+            }
+
+            let html = "";
+
+            rows.forEach(function(r,index){
+
+                html += `
+
+                <tr>
+                    <td>${r[1]}</td>
+
+                    <td>${r[2]}</td>
+
+                    <td>${r[3]}</td>
+
+                    <td>${r[4]}</td>
+
+                    <td>${r[5]}</td>
+
+                    <td>${r[6]}</td>
+
+                    <td><select
+                      onchange="updateMoMCategory(${index+2}, this.value)">
+
+                      <option value="Review Required"
+                      ${r[7] === "Review Required" ? "selected" : ""}>
+                      Review Required
+                      </option>
+
+                      <option value="Flawless"
+                      ${r[7] === "Flawless" ? "selected" : ""}>
+                      Flawless
+                      </option>
+
+                      <option value="Amendment Required"
+                      ${r[7] === "Amendment Required" ? "selected" : ""}>
+                      Amendment Required
+                      </option>
+
+                      <option value="Notice"
+                      ${r[7] === "Notice" ? "selected" : ""}>
+                      Notice
+                      </option>
+
+                      <option value="Missing Submission"
+                      ${r[7] === "Missing Submission" ? "selected" : ""}>
+                      Missing Submission
+                      </option>
+
+                      <option value="Excused"
+                      ${r[7] === "Excused" ? "selected" : ""}>
+                      Excused
+                      </option>
+                      </select>
+                    </td>
+
+                   <td>
+                      ${ r[7] === "Review Required"
+                          ?
+                          `<button
+                          class="secondary-btn"
+                          disabled>
+                          Categorize First
+                          </button>`
+                          :
+                          `<button
+                          class="secondary-btn"
+                          onclick="previewMoMEmail(${index+2})">
+                          Preview
+                          </button>`
+
+                          }
+
+                  </td>
+               </tr>
+
+                `;
+            });
+
+            tbody.innerHTML = html;
+
+        }
+
+    );
+
+}
+function refreshMoM(){
+
+    callServer(
+
+        "refreshMoMActionCenter",
+
+        [],
+
+        function(){
+
+            loadMoMActionCenter();
+
+            success("Action Center refreshed.");
+
+        }
+
+    );
+
+}
+
+
+function previewMoMEmail(rowNumber){
+
+    callServer(
+
+        "previewMoMEmail",
+
+        [rowNumber],
+
+        function(result){
+
+            openPreview(result);
+
+        }
+
+    );
+
+}
+
+function updateMoMCategory(rowNumber, category){
+if(category === "Amendment Required"){
+
+    openAmendmentReason(
+
+        rowNumber,
+
+        function(rowNumber, reason){
+
+            callServer(
+
+                "setMoMCategory",
+
+                [
+                    rowNumber,
+                    "Amendment Required"
+                ],
+
+                function(){
+
+                    callServer(
+
+                        "setMoMAmendmentReason",
+
+                        [
+                            rowNumber,
+                            reason
+                        ],
+
+                        function(){
+
+                            loadMoMActionCenter();
+
+                        }
+
+                    );
+
+                }
+
+            );
+
+        }
+
+    );
+
+    return;
+
+}
+if(category === "Excused"){
+
+    if(!confirm(
+
+        "Mark this submission as Excused?\n\n" +
+
+        "The record will be removed from the Action Center " +
+
+        "and recorded in the Excusal Registry."
+
+    ))
+    
+    {
+
+        loadMoMActionCenter();
+
+        return;
+
+    }
+
+    callServer(
+
+        "excuseMoMRecord",
+
+        [rowNumber],
+
+        function(){
+
+            loadMoMActionCenter();
+
+        }
+
+    );
+
+    return;
+
+}
+
+    callServer(
+
+        "setMoMCategory",
+
+        [rowNumber, category],
+
+        function(){
+
+            loadMoMActionCenter();
+
+        }
+
+    );
+
+}
+
+</script>

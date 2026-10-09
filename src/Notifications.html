@@ -1,0 +1,205 @@
+<div id="notificationContainer"></div>
+<div id="confirmModal" class="confirm-modal hidden">
+
+    <div class="preview-container" style="max-width:500px;">
+
+        <h2 id="confirmTitle">
+            Confirmation
+        </h2>
+
+        <p id="confirmMessage"
+           style="margin:20px 0;line-height:1.7;">
+        </p>
+
+        <div style="
+            display:flex;
+            justify-content:flex-end;
+            gap:12px;
+        ">
+
+            <button
+                class="secondary-btn"
+                onclick="closeConfirm(false)">
+                Cancel
+            </button>
+
+            <button
+                class="primary-btn"
+                onclick="closeConfirm(true)">
+                Confirm
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<style>
+
+#notificationContainer{
+
+    position:fixed;
+
+    bottom:20px;
+
+    right:20px;
+
+    z-index:99999;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.notification{
+
+    min-width:320px;
+
+    max-width:420px;
+
+    padding:16px 20px;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-weight:600;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.20);
+
+    animation:slideIn .25s ease;
+
+}
+
+.success{
+
+    background:#22C55E;
+
+}
+
+.error{
+
+    background:#EF4444;
+
+}
+
+.warning{
+
+    background:#F59E0B;
+
+}
+
+.info{
+
+    background:#2563EB;
+
+}
+
+@keyframes slideIn{
+
+from{
+
+    opacity:0;
+
+    transform:translateX(50px);
+
+}
+
+to{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+}
+
+</style>
+
+<script>
+
+function showNotification(message,type="success"){
+
+    const container=document.getElementById("notificationContainer");
+
+    const note=document.createElement("div");
+
+    note.className="notification "+type;
+
+    note.innerHTML=message;
+
+    container.appendChild(note);
+
+    setTimeout(function(){
+
+        note.remove();
+
+    },3000);
+
+}
+
+function success(message){
+
+    showNotification("✔ "+message,"success");
+
+}
+
+function error(message){
+
+    showNotification("✖ "+message,"error");
+
+}
+
+function warning(message){
+
+    showNotification("⚠ "+message,"warning");
+
+}
+
+function info(message){
+
+    showNotification("ℹ "+message,"info");
+
+}
+let confirmResolver = null;
+
+function showConfirm(title, message){
+
+    document.getElementById("confirmTitle").innerHTML = title;
+
+    document.getElementById("confirmMessage").innerHTML = message;
+
+    document
+        .getElementById("confirmModal")
+        .classList
+        .remove("hidden");
+
+    return new Promise(function(resolve){
+
+        confirmResolver = resolve;
+
+    });
+
+}
+
+function closeConfirm(result){
+
+    document
+        .getElementById("confirmModal")
+        .classList
+        .add("hidden");
+
+    if(confirmResolver){
+
+        confirmResolver(result);
+
+        confirmResolver = null;
+
+    }
+
+}
+</script>

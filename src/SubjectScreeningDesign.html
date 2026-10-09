@@ -1,0 +1,359 @@
+<div class="module-container">
+
+    <div class="module-header">
+
+        <div>
+
+            <h2>Subject Screening Audit</h2>
+
+            <div class="module-subtitle">
+                Review Subject Screening submissions and manage the audit workflow.
+            </div>
+
+        </div>
+
+        <div class="module-actions">
+
+            <label>Trimester</label>
+
+            <select id="subjectTrimester">
+                <option value="Trimester 1"> 1</option>
+                <option value="Trimester 2"> 2</option>
+                <option value="Trimester 3"> 3</option>
+            </select>
+
+            <label>Week</label>
+
+              <input
+                  type="number"
+                  id="subjectWeek"
+                  min="1"
+                  placeholder="Enter Week Number">
+
+            <button class="primary-btn" onclick="runSubjectScreeningAuditUI()">
+                Run Audit
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-title">
+            Action Center
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>System</th>
+                    <th>Division</th>
+                    <th>Department</th>
+                    <th>Subject</th>
+                    <th>Grade</th>
+                    <th>HoD</th>
+                    <th>Evidence</th>
+                    <th>Category</th>
+                    <th>Preview</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="subjectActionTable">
+
+                <tr>
+
+                    <td colspan="9" style="text-align:center;">
+                        No audit has been run.
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+function runSubjectScreeningAuditUI(){
+
+    const trimester =
+        document.getElementById("subjectTrimester").value;
+
+    const week =
+        document.getElementById("subjectWeek").value;
+
+    callServer(
+
+        "runSubjectScreeningAudit",
+
+        [trimester, week],
+
+        function(){
+
+            loadSubjectActionCenter();
+
+            success(
+                "Audit completed successfully.\n\n" +
+                "Please review the Action Center before processing emails."
+            );
+
+        }
+
+    );
+
+}
+
+function loadSubjectActionCenter(){
+
+    callServer(
+
+        "getSubjectActionCenter",
+
+        [],
+
+        function(rows){
+
+            const tbody =
+                document.getElementById("subjectActionTable");
+
+            if(rows.length === 0){
+
+                tbody.innerHTML =
+                    "<tr><td colspan='9' style='text-align:center;'>No records.</td></tr>";
+
+                return;
+
+            }
+
+            let html = "";
+
+            rows.forEach(function(r,index){
+
+                html += `
+
+                <tr>
+
+                    <td>${r[1]}</td>
+
+                    <td>${r[2]}</td>
+
+                    <td>${r[3]}</td>
+
+                    <td>${r[4]}</td>
+
+                    <td>${r[5]}</td>
+
+                    <td>${r[6]}</td>
+
+                    <td>${String(r[10]).replace(/\n/g, "<br>")}</td>
+
+                    <td>
+
+                    <select onchange="updateSubjectCategory(${index + 2}, this.value)">
+
+                        <option value="Review Required"
+                            ${r[12] === "Review Required" ? "selected" : ""}>
+                            Review Required
+                        </option>
+
+                        <option value="Flawless"
+                            ${r[12] === "Flawless" ? "selected" : ""}>
+                            Flawless
+                        </option>
+
+                        <option value="Amendment Required"
+                            ${r[12] === "Amendment Required" ? "selected" : ""}>
+                            Amendment Required
+                        </option>
+
+                        <option value="Notice"
+                            ${r[12] === "Notice" ? "selected" : ""}>
+                            Notice
+                        </option>
+
+                        <option value="Missing Submission"
+                            ${r[12] === "Missing Submission" ? "selected" : ""}>
+                            Missing Submission
+                        </option>
+
+                        <option value="Excused"
+                            ${r[12] === "Excused" ? "selected" : ""}>
+                            Excused
+                        </option>
+
+                    </select>
+
+                    </td>
+
+                    <td>
+
+                        ${
+                            !r[12] || r[12] === "Review Required"
+                            ?
+                            `<button
+                                class="secondary-btn"
+                                disabled>
+                                Categorize First
+                            </button>`
+                            :
+                            `<button
+                                class="secondary-btn"
+                                onclick="previewSubjectEmail(${index + 2})">
+                                Preview
+                            </button>`
+                        }
+
+                    </td>
+
+                </tr>
+
+                `;
+
+            });
+
+            tbody.innerHTML = html;
+
+        }
+
+    );
+
+}
+
+function previewSubjectEmail(rowNumber){
+
+    callServer(
+
+        "previewSubjectEmail",
+
+        [rowNumber],
+
+        function(result){
+
+            openPreview(result);
+
+        }
+
+    );
+
+}
+
+function updateSubjectCategory(rowNumber, category){
+
+    if(category === "Amendment Required"){
+
+        openAmendmentReason(
+
+                rowNumber,
+
+                "Subject Screening",
+
+            function(rowNumber, reason){
+
+                callServer(
+
+                    "setSubjectCategory",
+
+                    [
+
+                        rowNumber,
+
+                        "Amendment Required"
+
+                    ],
+
+                    function(){
+
+                        callServer(
+
+                            "setSubjectAmendmentReason",
+
+                            [
+
+                                rowNumber,
+
+                                reason
+
+                            ],
+
+                            function(){
+
+                                loadSubjectActionCenter();
+
+                            }
+
+                        );
+
+                    }
+
+                );
+
+            }
+
+        );
+
+        return;
+
+    }
+
+    if(category === "Excused"){
+
+        if(!confirm(
+
+            "Mark this submission as Excused?\n\n" +
+
+            "The record will be removed from the Action Center " +
+
+            "and recorded in the Excusal Registry."
+
+        )){
+
+            loadSubjectActionCenter();
+
+            return;
+
+        }
+
+        callServer(
+
+            "excuseSubjectRecord",
+
+            [rowNumber],
+
+            function(){
+
+                loadSubjectActionCenter();
+
+            }
+
+        );
+
+        return;
+
+    }
+
+    callServer(
+
+        "setSubjectCategory",
+
+        [rowNumber, category],
+
+        function(){
+
+            loadSubjectActionCenter();
+
+        }
+
+    );
+
+}
+</script>

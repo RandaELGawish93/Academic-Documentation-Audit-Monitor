@@ -1,0 +1,253 @@
+<div id="amendmentModal" class="modal hidden">
+
+    <div class="preview-container">
+
+        <div class="preview-header">
+
+            <div>
+
+                <h2>Amendment Required</h2>
+
+                <div class="preview-subtitle">
+                    Please select the reason for requesting this amendment.
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="form-group">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="amendmentReason"
+                        value="File naming convention is incorrect.">
+
+                    File naming convention is incorrect.
+
+                </label>
+
+            </div>
+
+            <br>
+
+            <div class="form-group">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="amendmentReason"
+                        value="Unsupported file type.">
+
+                    Unsupported file type.
+
+                </label>
+
+            </div>
+
+            <br>
+
+            <div class="form-group">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="amendmentReason"
+                        value="Both the file naming convention and the submitted file type require correction.">
+
+                    Both of the above.
+
+                </label>
+
+            </div>
+
+            <br>
+
+            <div
+                id="dynamicReasonContainer"
+                class="form-group hidden">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        id="dynamicAmendmentReason"
+                        name="amendmentReason"
+                        value="">
+
+                    <span id="dynamicAmendmentReasonLabel">
+                        Incomplete submission.
+                    </span>
+
+                </label>
+
+            </div>
+
+            <br><br>
+
+            <div class="preview-actions">
+
+                <button
+                    class="secondary-btn"
+                    onclick="closeAmendmentReason()">
+
+                    Cancel
+
+                </button>
+
+                <button
+                    class="primary-btn"
+                    onclick="saveAmendmentReason()">
+
+                    Save
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let amendmentRow = null;
+let amendmentModule = null;
+let amendmentCallback = null;
+
+function openAmendmentReason(
+    rowNumber,
+    module,
+    callback
+){
+
+    amendmentRow = rowNumber;
+    amendmentModule = module;
+    amendmentCallback = callback;
+
+    const container =
+        document.getElementById(
+            "dynamicReasonContainer"
+        );
+
+    const input =
+        document.getElementById(
+            "dynamicAmendmentReason"
+        );
+
+    const label =
+        document.getElementById(
+            "dynamicAmendmentReasonLabel"
+        );
+
+    container.classList.add("hidden");
+
+    input.checked = false;
+
+        if(module === "Minutes of Meetings"){
+
+    container.classList.remove("hidden");
+
+    input.value = "";
+
+    label.innerHTML =
+        "Please enter the amendment reason.";
+
+    }
+
+    if(module === "Teacher Observation"){
+
+        container.classList.remove("hidden");
+
+        input.value =
+            "Incomplete observation submission. The required number of teacher observations was not submitted.";
+
+        label.innerHTML =
+            "Incomplete observation submission.";
+
+    }
+
+    if(module === "Subject Screening"){
+
+        container.classList.remove("hidden");
+
+        input.value =
+            "Incomplete subject screening submission. The required number of subject screening reports was not submitted.";
+
+        label.innerHTML =
+            "Incomplete subject screening submission.";
+
+    }
+
+    document
+        .getElementById("amendmentModal")
+        .classList
+        .remove("hidden");
+
+}
+
+function closeAmendmentReason(){
+
+    amendmentRow = null;
+    amendmentModule = null;
+    amendmentCallback = null;
+
+    document
+        .querySelectorAll(
+            'input[name="amendmentReason"]'
+        )
+        .forEach(function(item){
+
+            item.checked = false;
+
+        });
+
+    document
+        .getElementById(
+            "dynamicReasonContainer"
+        )
+        .classList
+        .add("hidden");
+
+    document
+        .getElementById("amendmentModal")
+        .classList
+        .add("hidden");
+
+}
+
+function saveAmendmentReason(){
+
+    const selected =
+        document.querySelector(
+            'input[name="amendmentReason"]:checked'
+        );
+
+    if(!selected){
+
+        error(
+            "Please select an amendment reason."
+        );
+
+        return;
+
+    }
+
+    amendmentCallback(
+        amendmentRow,
+        selected.value
+    );
+
+    closeAmendmentReason();
+
+}
+
+</script>

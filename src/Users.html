@@ -1,0 +1,183 @@
+<div class="page-content">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Users</h2>
+
+            <p>Manage authorized users and email recipients.</p>
+
+        </div>
+
+        <div>
+
+            <button class="primary-btn" onclick="loadUsers()">
+                Refresh
+            </button>
+
+            <button class="primary-btn" onclick="saveUsers()">
+                Save Changes
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <table class="table" id="usersTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>Active</th>
+                    <th>Role</th>
+                    <th>Scope</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Receive Emails</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+window.addEventListener("load", loadUsers);
+
+function loadUsers(){
+
+    google.script.run
+
+    .withSuccessHandler(function(users){
+        const tbody = document.querySelector("#usersTable tbody");
+
+        tbody.innerHTML = "";
+
+        users.forEach(function(user,index){
+
+            tbody.innerHTML += `
+
+            <tr>
+
+                <td style="text-align:center">
+
+                    <input
+                        type="checkbox"
+                        ${user.active ? "checked" : ""}
+                        data-row="${index}"
+                        class="active">
+
+                </td>
+
+                <td>${user.role}</td>
+
+                <td>${user.scope}</td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        value="${user.name}"
+                        class="name">
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="email"
+                        value="${user.email}"
+                        class="email">
+
+                </td>
+
+                <td style="text-align:center">
+
+                    <input
+                        type="checkbox"
+                        ${user.receiveEmails ? "checked" : ""}
+                        class="receive">
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    })
+
+    .getAllUsers();
+
+}
+
+function saveUsers(){
+
+    showLoading("Saving users...");
+    const rows=[];
+
+    document
+    .querySelectorAll("#usersTable tbody tr")
+    .forEach(function(row){
+
+        rows.push({
+
+            active:
+
+                row.querySelector(".active").checked,
+
+            role:
+
+                row.cells[1].innerText,
+
+            scope:
+
+                row.cells[2].innerText,
+
+            name:
+
+                row.querySelector(".name").value,
+
+            email:
+
+                row.querySelector(".email").value,
+
+            receiveEmails:
+
+                row.querySelector(".receive").checked
+
+        });
+
+    });
+    google.script.run
+
+    .withSuccessHandler(function(){
+
+    hideLoading();
+    success("Users updated successfully.");
+
+    })
+    .withFailureHandler(function(err){
+    hideLoading();
+    error(err.message);
+    })
+
+    .saveUsers(rows);
+
+}
+
+</script>

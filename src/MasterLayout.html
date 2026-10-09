@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ADAM 2.0</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <?!= include('Styles'); ?>
+
+</head>
+
+<body>
+
+<div id="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-title">
+                ADAM
+            </div>
+
+            <div class="logo-subtitle">
+                Academic Documentation Audit Monitor
+            </div>
+
+        </div>
+
+        <nav class="menu">
+
+            <button class="menu-item active" onclick="showPage('dashboard')">
+                Dashboard
+            </button>
+
+            <button class="menu-item" onclick="showPage('settings')">
+                Settings
+            </button>
+            <button class="menu-item" onclick="showPage('users')">
+                Users
+            </button>
+            
+            <button class="menu-item" onclick="showPage('mom')">
+                Minutes of Meetings
+            </button>
+
+            <button class="menu-item" onclick="showPage('subject')">
+                Subject Screening
+            </button>
+
+            <button class="menu-item" onclick="showPage('observation')">
+                Teacher Observation
+            </button>
+
+            <button class="menu-item" onclick="showPage('archive')">
+                Archive
+            </button>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1 id="pageTitle">
+                    Dashboard
+                </h1>
+
+                <div class="subtitle">
+                    Academic Documentation Audit Monitor
+                </div>
+
+            </div>
+
+            <div class="user-area">
+
+                <div id="userName">
+                    Loading...
+                </div>
+
+            </div>
+
+        </header>
+
+        <section id="content">
+
+            <div id="dashboardPage" class="page">
+
+                <?!= include('Dashboard'); ?>
+
+            </div>
+
+            <div id="settingsPage" class="page hidden">
+
+                <?!= include('SettingsDesign'); ?>
+
+            </div>
+
+            <div id="usersPage" class="page hidden">
+
+                <?!= include('Users'); ?>
+
+            </div>
+
+            <div id="momPage" class="page hidden">
+
+                <?!= include('MoMDesign'); ?>
+
+            </div>
+
+            <div id="subjectPage" class="page hidden">
+
+                <?!= include('SubjectScreeningDesign'); ?>
+
+            </div>
+
+            <div id="observationPage" class="page hidden">
+
+                <?!= include('TeacherObservationDesign'); ?>
+
+            </div>
+
+            <div id="archivePage" class="page hidden">
+
+                <h2>Archive</h2>
+
+                <p>Module under development.</p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<?!= include('Scripts'); ?>
+<?!= include('Notifications'); ?>
+<?!= include('Loading'); ?>
+<?!= include('Preview'); ?>
+<?!= include('AmendmentReason'); ?>
+</body>
+
+</html>

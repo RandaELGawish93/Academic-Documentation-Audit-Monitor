@@ -1,0 +1,117 @@
+<div>
+
+<p>Dear <b><?= name ?></b>,</p>
+
+<p>
+
+Thank you for submitting your
+
+<b><?= moduleName ?></b>
+
+for
+
+<b><?= trimester ?></b>,
+
+<b>Week <?= week ?></b>..
+
+</p>
+
+<p>
+
+Your submission has been reviewed and accepted. However, your
+
+<b><?= moduleName ?></b>
+
+documentation was received after the submission deadline.
+
+</p>
+
+<div style="margin:25px 0;">
+
+<span class="badge yellow">
+
+Late Submission Notice
+
+</span>
+
+</div>
+
+<table>
+
+<? if (subjectName) { ?>
+
+<tr>
+
+    <td width="35%"><b>Subject</b></td>
+
+    <td><?= subjectName ?></td>
+
+</tr>
+
+<tr>
+
+    <td><b>Grade</b></td>
+
+    <td><?= grade ?></td>
+
+</tr>
+
+<? } ?>
+
+<tr>
+
+<td width="35%"><b>Module</b></td>
+
+<td><?= moduleName ?> Audit</td>
+
+</tr>
+
+<tr>
+
+<td><b>Academic Year</b></td>
+
+<td><?= academicYear ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Trimester</b></td>
+
+<td><?= trimester ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Week</b></td>
+
+<td><?= week ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Status</b></td>
+
+<td>Late Submission</td>
+
+</tr>
+
+</table>
+
+<p style="margin-top:30px;">
+
+Please ensure that future submissions are uploaded by the communicated deadline to support timely academic monitoring and institutional documentation.
+
+</p>
+
+<p>
+
+If exceptional circumstances prevent timely submission, kindly inform the Academic Office in advance so that appropriate arrangements can be considered.
+
+Thank you for your continued cooperation.
+
+</p>
+
+</div>

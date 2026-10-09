@@ -1,0 +1,386 @@
+<div class="module-container">
+
+    <div class="module-header">
+
+        <div>
+
+            <h2>Teacher Observation Audit</h2>
+
+            <div class="module-subtitle">
+                Scan Teacher Observation folders, Compare expected vs uploaded, review evidence, and process communication.
+            </div>
+
+        </div>
+
+        <div class="module-actions">
+         
+         <label>Trimeser</label>
+          <select id="observationTrimester">
+              <option value="Trimester 1">1</option>
+              <option value="Trimester 2">2</option>
+              <option value="Trimester 3">3</option>
+          </select>
+
+          <label>Week</label>
+
+          <input
+              type="number"
+              id="observationWeek"
+              min="1"
+              placeholder="Enter Week Number">
+
+          <button class="primary-btn"
+                  onclick="runTeacherObservationAuditUI()">
+              Run Audit
+          </button>
+
+      </div>
+
+    </div>
+
+    <!-- Action Center -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Action Center
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Division</th>
+                    <th>Department</th>
+                    <th>HoD</th>
+                    <th>Expected</th>
+                    <th>Uploaded</th>
+                    <th>Evidence</th>
+                    <th>Category</th>
+                    <th>Preview</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="observationActionTable">
+
+                <tr>
+
+                    <td colspan="=8" style="text-align:center;">
+                        No audit has been run.
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+function runTeacherObservationAuditUI(){
+
+    const trimester =
+        document.getElementById("observationTrimester").value;
+
+    const week =
+        document.getElementById("observationWeek").value;
+
+    callServer(
+
+        "runTeacherObservationAudit",
+
+        [trimester, week],
+
+        function(){
+
+            loadObservationActionCenter();
+
+            success(
+                "Audit completed successfully.\n\n" +
+                "Please review the Action Center before processing emails."
+            );
+
+        }
+
+    );
+
+}
+
+function loadObservationActionCenter(){
+
+    callServer(
+
+        "getObservationActionCenter",
+
+        [],
+
+        function(rows){
+
+            const tbody = document.getElementById("observationActionTable");
+
+            if(rows.length === 0){
+
+                tbody.innerHTML =
+                    "<tr><td colspan='8' style='text-align:center;'>No records.</td></tr>";
+
+                return;
+
+            }
+
+            let html = "";
+
+            rows.forEach(function(r,index){
+
+                html += `
+
+                <tr>
+
+                    <td>${r[1]}</td>
+
+                    <td>${r[2]}</td>
+
+                    <td>${r[3]}</td>
+
+                    <td>${r[6]}</td>
+
+                    <td>${r[7]}</td>
+                  
+                    <td class="evidence-cell">${String(r[8]).trim().split("\n").filter(file => file.trim() !== "").map(file => `<div class="evidence-file">${file}</div>`).join("")}</td>
+
+                    <td>
+
+                        <select onchange="updateObservationCategory(${index+2}, this.value)">
+
+                            <option value="Review Required"
+                            ${!r[9] || r[9] === "Review Required" ? "selected" : ""}>
+                            Review Required
+                            </option>
+
+                            <option value="Flawless"
+                            ${r[9] === "Flawless" ? "selected" : ""}>
+                            Flawless
+                            </option>
+
+                            <option value="Amendment Required"
+                            ${r[9] === "Amendment Required" ? "selected" : ""}>
+                            Amendment Required
+                            </option>
+
+                            <option value="Notice"
+                            ${r[9] === "Notice" ? "selected" : ""}>
+                            Notice
+                            </option>
+
+                            <option value="Missing Submission"
+                            ${r[9] === "Missing Submission" ? "selected" : ""}>
+                            Missing Submission
+                            </option>
+
+                            <option value="Excused"
+                            ${r[9] === "Excused" ? "selected" : ""}>
+                            Excused
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                    <td>
+
+                        ${
+                        !r[9] || r[9] === "Review Required"
+
+                        ?
+
+                        `<button
+                        class="secondary-btn"
+                        disabled>
+                        Categorize First
+                        </button>`
+
+                        :
+
+                        `<button
+                        class="secondary-btn"
+                        onclick="previewObservationEmail(${index+2})">
+                        Preview
+                        </button>`
+
+                        }
+
+                    </td>
+
+                </tr>
+
+                `;
+
+            });
+
+            tbody.innerHTML = html;
+
+        }
+
+    );
+
+}
+
+function refreshMoM(){
+
+    callServer(
+
+        "refreshMoMActionCenter",
+
+        [],
+
+        function(){
+
+            loadObservationActionCenter();
+
+            success("Action Center refreshed.");
+
+        }
+
+    );
+
+}
+
+
+function previewObservationEmail(rowNumber){
+
+    callServer(
+
+        "previewObservationEmail",
+
+        [rowNumber],
+
+        function(result){
+
+            openPreview(result);
+
+        }
+
+    );
+
+}
+
+function updateObservationCategory(rowNumber, category){
+if(category === "Amendment Required"){
+
+    openAmendmentReason(
+
+            rowNumber,
+
+            "Teacher Observation",
+
+        function(rowNumber, reason){
+
+            callServer(
+
+                "setObservationCategory",
+
+                [
+
+                    rowNumber,
+
+                    "Amendment Required"
+
+                ],
+
+                function(){
+
+                    callServer(
+
+                        "setObservationAmendmentReason",
+
+                        [
+
+                            rowNumber,
+
+                            reason
+
+                        ],
+
+                        function(){
+
+                            loadObservationActionCenter();
+                        }
+
+                    );
+
+                }
+
+            );
+
+        }
+
+    );
+
+    return;
+
+}
+if(category === "Excused"){
+
+    showConfirm(
+
+        "Excuse Submission",
+
+        "Mark this submission as Excused?<br><br>" +
+
+        "The record will be removed from the Action Center " +
+
+        "and recorded in the Excusal Registry."
+
+    ).then(function(confirmed){
+
+        if(!confirmed){
+
+            loadObservationActionCenter();
+
+            return;
+
+        }
+
+        callServer(
+
+            "excuseObservationRecord",
+
+            [rowNumber],
+
+            function(){
+
+                loadObservationActionCenter();
+
+            }
+
+        );
+
+    });
+
+    return;
+
+}
+
+callServer(
+
+    "setObservationCategory",
+
+    [rowNumber, category],
+
+    function(){
+
+        loadObservationActionCenter();
+
+    }
+
+);
+
+}
+
+</script>

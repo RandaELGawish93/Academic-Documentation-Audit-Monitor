@@ -1,0 +1,117 @@
+<div id="loadingOverlay" class="loading-hidden">
+
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <div id="loadingMessage">
+
+            Please wait...
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+#loadingOverlay{
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:rgba(255,255,255,.75);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999999;
+
+}
+
+.loading-hidden{
+
+    display:none !important;
+
+}
+
+.loading-box{
+
+    background:white;
+
+    padding:35px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+}
+
+.spinner{
+
+    width:48px;
+
+    height:48px;
+
+    border:5px solid #ddd;
+
+    border-top:5px solid #2563EB;
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+
+    margin:auto;
+
+    margin-bottom:20px;
+
+}
+
+@keyframes spin{
+
+from{
+
+transform:rotate(0deg);
+
+}
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+</style>
+
+<script>
+
+function showLoading(message="Please wait..."){
+
+    document.getElementById("loadingMessage").innerHTML=message;
+
+    document.getElementById("loadingOverlay").classList.remove("loading-hidden");
+
+}
+
+function hideLoading(){
+
+    document.getElementById("loadingOverlay").classList.add("loading-hidden");
+
+}
+
+</script>

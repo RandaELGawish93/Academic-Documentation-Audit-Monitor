@@ -1,0 +1,100 @@
+<div>
+
+<p>Dear <b><?= name ?></b>,</p>
+
+<p>
+
+Thank you for submitting your
+<b><?= moduleName ?></b>
+for
+<b><?= trimester ?></b>,
+<b>Week <?= week ?></b>.
+
+</p>
+
+<p>
+
+Your submission has been reviewed and meets all current audit requirements.
+
+</p>
+
+<div style="margin:25px 0;">
+
+<span class="badge green">
+
+Flawless Submission
+
+</span>
+
+</div>
+
+<table>
+
+<? if (subjectName) { ?>
+
+<tr>
+
+    <td width="35%"><b>Subject</b></td>
+
+    <td><?= subjectName ?></td>
+
+</tr>
+
+<tr>
+
+    <td><b>Grade</b></td>
+
+    <td><?= grade ?></td>
+
+</tr>
+
+<? } ?>
+
+<tr>
+    <td width="35%"><b>Module</b></td>
+    <td><?= moduleName ?> Audit</td>
+</tr>
+
+<tr>
+
+<td><b>Academic Year</b></td>
+
+<td><?= academicYear ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Trimester</b></td>
+
+<td><?= trimester ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Week</b></td>
+
+<td><?= week ?></td>
+
+</tr>
+
+<tr>
+
+<td><b>Status</b></td>
+
+<td>Flawless</td>
+
+</tr>
+
+</table>
+
+<p style="margin-top:30px;">
+
+Thank you for maintaining high documentation standards and ensuring the timely submission of your documentation.
+
+Your continued cooperation and commitment to academic excellence are greatly appreciated.
+
+</p>
+
+</div>
